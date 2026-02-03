@@ -4,7 +4,9 @@
 BASE_DIR="$HOME/atcoder"
 IN_FILE="$BASE_DIR/sh/in.txt"
 OUT_FILE="$BASE_DIR/sh/out.txt"
-SOURCE_FILE="${1:-main}.cpp" # 引数1: ソースファイル名 (省略時はmain.cpp)
+
+TEMP_NAME="${1:-main}"
+SOURCE_FILE="${TEMP_NAME%.cpp}.cpp" # 引数1: ソースファイル名 (省略時はmain.cpp)
 MODE="$2"                    # 引数2: debug または terminal または 保存名
 
 # 入力ファイルがなければ作成
