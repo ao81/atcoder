@@ -4,12 +4,23 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "~/atcoder/_ac-library/"
+                "~/atcoder/_ac-library/",
+                "/usr/include/**",
+                "/usr/local/include/**"
             ],
             "defines": [],
             "cStandard": "c17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "~/atcoder/_ac-library/",
+                    "/usr/include",
+                    "/usr/local/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
