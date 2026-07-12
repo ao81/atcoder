@@ -10,11 +10,9 @@ using vvl = vector<vector<ll>>;
 template <class T> using V = vector<T>;
 constexpr ll INF = 1ll << 60;
 
-// a = min(a, b) / max(a, b)。更新されたら true
 template <class A, class B> bool chmin(A &a, const B &b) { return b < a ? (a = b, true) : false; }
 template <class A, class B> bool chmax(A &a, const B &b) { return a < b ? (a = b, true) : false; }
 
-// vector をまとめて入出力: cin >> v; cout << v << "\n";
 template <class T> istream &operator>>(istream &is, vector<T> &v) {
 	for (auto &e : v) is >> e;
 	return is;
@@ -29,8 +27,6 @@ template <class T, class U> ostream &operator<<(ostream &os, const pair<T, U> &p
 
 void yesno(bool ok) { cout << (ok ? "Yes" : "No") << "\n"; }
 
-// デバッグ出力: dbg(x, y, v); → stderr に [L12] x, y, v = 1, 2, 3 4 5
-// atc がローカルでは -DLOCAL を付けるので、提出コードに残してもジャッジ側では消える
 #ifdef LOCAL
 template <class T, class... Ts> void dbg_out(const T &a, const Ts &...b) {
 	cerr << a;
@@ -43,6 +39,6 @@ template <class T, class... Ts> void dbg_out(const T &a, const Ts &...b) {
 #endif
 
 int main(void) {
-	cin.tie(nullptr)->sync_with_stdio(false);  // インタラクティブ問題では cout << endl で flush すること
+	cin.tie(nullptr)->sync_with_stdio(false);
 
 }
