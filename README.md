@@ -2,12 +2,12 @@
 
 ## 使い方 (atc ツール)
 
-**VS Code で `Ctrl+Shift+Space`** → 開いている .cpp をサンプル自動取得 → コンパイル → 全ケース照合 (自動テスト)。
-**VS Code で `Ctrl+Space`** → コンパイルして手入力で実行 (手動テスト)。
+**VS Code で `Ctrl+Space`** → 開いている .cpp をサンプル自動取得 → コンパイル → 全ケース照合 (自動テスト)。
+**VS Code で `Ctrl+Shift+Space`** → コンパイルして手入力で実行 (手動テスト)。
 
-ターミナル (bash) では `Ctrl+Space` = 手動テスト。最後に編集した .cpp が対象。
+ターミナル (bash) では `Ctrl+Space` = 自動テスト。最後に編集した .cpp が対象。
 (通常のターミナルは Ctrl+Shift+Space を Ctrl+Space と区別できないため、
-自動テストはコマンド `atc test` で。VS Code 内では両キーとも正しく動く)
+手動テストはコマンド `atc run` で。VS Code 内では両キーとも正しく動く)
 
 ```
 atc test [file] [-d] [-r]   サンプル取得 + コンパイル + 全ケース照合 (Ctrl+Space と同じ)
