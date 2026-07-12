@@ -171,6 +171,10 @@ def fetch_samples(contest, slug):
             outs.setdefault(num, text)
     samples = [(ins[n], outs[n]) for n in sorted(ins) if n in outs]
     if not samples:
+        # インタラクティブ問題: 入力例/出力例が無く「入出力例」の対話表になっている
+        if ("インタラクティブ" in page or "入出力例" in page
+                or "Sample Interaction" in page):
+            return None, url
         hint = ""
         if "ログイン" in page and "入力例" not in page:
             hint = " (開催中のコンテストは `atc login` でセッション設定が必要です)"
@@ -208,29 +212,39 @@ def get_slug(contest, letter):
 
 
 def ensure_samples(contest, letter, refetch=False):
-    """サンプルを tests/<letter>/ に保存し、テストケース一覧を返す。"""
+    """サンプルを tests/<letter>/ に保存し、(ケース一覧, インタラクティブ?) を返す。"""
     tdir = tests_dir(letter)
+    marker = os.path.join(tdir, ".interactive")
     have = sorted(f for f in os.listdir(tdir)) if os.path.isdir(tdir) else []
-    if refetch or not any(f.endswith(".in") for f in have):
+    interactive = os.path.exists(marker)
+    if refetch or (not interactive and not any(f.endswith(".in") for f in have)):
         slug = get_slug(contest, letter)
         print(dim(f"サンプル取得中: {contest}/{slug} ..."), flush=True)
         samples, url = fetch_samples(contest, slug)
         os.makedirs(tdir, exist_ok=True)
-        for i, (si, so) in enumerate(samples, 1):
-            with open(os.path.join(tdir, f"{i}.in"), "w") as f:
-                f.write(si)
-            with open(os.path.join(tdir, f"{i}.out"), "w") as f:
-                f.write(so)
         with open(os.path.join(tdir, ".url"), "w") as f:
             f.write(url.split("?")[0])
-        print(dim(f"  -> {len(samples)} ケース保存 ({tdir}/)"))
+        interactive = samples is None
+        if interactive:
+            with open(marker, "w") as f:
+                f.write("この問題はインタラクティブ形式 (サンプル照合不可)\n")
+            print(yellow("  -> インタラクティブ問題 (通常サンプルなし)"))
+        else:
+            if os.path.exists(marker):
+                os.remove(marker)
+            for i, (si, so) in enumerate(samples, 1):
+                with open(os.path.join(tdir, f"{i}.in"), "w") as f:
+                    f.write(si)
+                with open(os.path.join(tdir, f"{i}.out"), "w") as f:
+                    f.write(so)
+            print(dim(f"  -> {len(samples)} ケース保存 ({tdir}/)"))
     cases = []
     for f in sorted(os.listdir(tdir), key=natural_key):
         if f.endswith(".in"):
             base = f[:-3]
             out = os.path.join(tdir, base + ".out")
             cases.append((base, os.path.join(tdir, f), out if os.path.exists(out) else None))
-    return cases
+    return cases, interactive
 
 
 def natural_key(s):
@@ -344,13 +358,21 @@ def cmd_test(args):
         die("パスからコンテストを推定できません (例: ~/atcoder/abc/46/466/ で実行)")
     letter = problem_letter(src)
 
-    cases = ensure_samples(contest, letter, refetch=refetch)
+    cases, interactive = ensure_samples(contest, letter, refetch=refetch)
     binary = compile_cpp(src, debug=debug)
     url = problem_url(letter)
 
     print(f"\n{bold(contest.upper() + ' ' + letter.upper())} — {src}"
           + (f"  {cyan(url)}" if url else ""))
     print(dim("─" * 60))
+
+    if interactive and not cases:
+        print(yellow("  インタラクティブ問題のためサンプル照合はできません。"))
+        print(f"  コンパイルは {green('OK')} です。動作確認は手動対話で:")
+        print(f"    {cyan('atc run ' + src)}")
+        print("  (入出力例は問題ページ参照。tests/%s/ に自作の .in/.out を置けば照合もできます)" % letter)
+        print(dim("─" * 60))
+        return 0
 
     n_ac = n_total = 0
     judged_all = True
@@ -389,6 +411,9 @@ def cmd_test(args):
         n_total += 1
 
     print(dim("─" * 60))
+    if n_total == 0 and judged_all:
+        print(yellow("判定対象のケースがありません (出力表示のみ)"))
+        return 0
     if n_ac == n_total and judged_all and n_total > 0:
         submit = ""
         if url:
@@ -596,5 +621,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print()
         sys.exit(130)
+    except RuntimeError as e:
+        die(str(e))
     except urllib.error.URLError as e:
         die(f"通信エラー: {e}")
