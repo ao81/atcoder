@@ -9,10 +9,13 @@
 (通常のターミナルは Ctrl+Shift+Space を Ctrl+Space と区別できないため、
 手動テストはコマンド `atc run` で。VS Code 内では両キーとも正しく動く)
 
+`Ctrl+N` = 新規コンテスト作成 (コンテスト名と問題を聞いて作成)。
+
 ```
 atc test [file] [-d] [-r]   サンプル取得 + コンパイル + 全ケース照合 (Ctrl+Space と同じ)
                             -d: sanitizer 付きデバッグビルド  -r: サンプル再取得
-atc new abc467              コンテスト用フォルダ作成 (a〜g.cpp) + 全問サンプル事前取得
+atc new abc467 [問題]       コンテスト用フォルダ作成 + サンプル事前取得 (Ctrl+N と同じ)
+                            問題: 4 / a-d / abd など。省略時は問題一覧から自動
 atc run [file]              コンパイルして手入力で実行 (従来の run 相当)
 atc open [file]             問題ページをブラウザで開く
 atc stress <解法> <愚直> <生成器.py> [回数]

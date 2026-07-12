@@ -11,6 +11,7 @@ import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -436,25 +437,41 @@ def cmd_fetch(args):
     return 0
 
 
+def parse_letters(spec):
+    """'4' -> a-d / 'a-d' -> a,b,c,d / 'abd' や 'a,b,d' -> そのまま"""
+    spec = spec.lower().strip()
+    if spec.isdigit() and 1 <= int(spec) <= 8:
+        return [chr(ord("a") + i) for i in range(int(spec))]
+    m = re.fullmatch(r"([a-h])-([a-h])", spec)
+    if m and m.group(1) <= m.group(2):
+        return [chr(c) for c in range(ord(m.group(1)), ord(m.group(2)) + 1)]
+    if re.fullmatch(r"[a-h][a-h,]*", spec):
+        return sorted(set(spec.replace(",", "")))
+    die(f"問題の指定が不正です: {spec} (例: 4 / a-d / abd)")
+
+
 def cmd_new(args):
     if not args:
-        die("使い方: atc new <コンテスト名> (例: atc new abc467)")
+        die("使い方: atc new <コンテスト名> [問題] (例: atc new abc467 / atc new abc123 a-d)")
     contest = args[0].lower()
     cdir = contest_dir(contest)
     os.makedirs(cdir, exist_ok=True)
     template = os.path.join(BASE_DIR, "!template.cpp")
 
-    letters = None
-    try:
-        slugs = fetch_task_slugs(contest)
-        letters = sorted(slugs.keys())
-        print(f"問題一覧: {', '.join(l.upper() for l in letters)}")
-    except SystemExit:
-        raise
-    except Exception as e:
-        print(yellow(f"問題一覧を取得できませんでした ({e})"))
-        print(yellow("コンテスト開始前かもしれません。a〜g を作成します。"))
-        letters = list("abcdefg")
+    if len(args) > 1 and args[1].strip():
+        letters = parse_letters(args[1])
+        print(f"作成する問題: {', '.join(l.upper() for l in letters)}")
+    else:
+        try:
+            slugs = fetch_task_slugs(contest)
+            letters = sorted(slugs.keys())
+            print(f"問題一覧: {', '.join(l.upper() for l in letters)}")
+        except SystemExit:
+            raise
+        except Exception as e:
+            print(yellow(f"問題一覧を取得できませんでした ({e})"))
+            print(yellow("コンテスト開始前かもしれません。a〜g を作成します。"))
+            letters = list("abcdefg")
 
     for l in letters:
         dst = os.path.join(cdir, f"{l}.cpp")
@@ -476,11 +493,16 @@ def cmd_new(args):
         for l in letters:
             try:
                 ensure_samples(contest, l)
+            except SystemExit:
+                pass  # die() がエラー表示済み。残りの問題の取得は続行
             except Exception as e:
                 print(yellow(f"  {l.upper()}: サンプル取得失敗 ({e})"))
     finally:
         os.chdir(cwd)
     print(f"cd {cdir}")
+    # VS Code のターミナル/タスクから実行された場合は最初の問題を開く
+    if os.environ.get("TERM_PROGRAM") == "vscode" and shutil.which("code"):
+        subprocess.run(["code", os.path.join(cdir, f"{letters[0]}.cpp")], check=False)
     return 0
 
 
@@ -548,6 +570,14 @@ def cmd_stress(args):
     return 0
 
 
+def cmd_dir(args):
+    """コンテストのディレクトリパスを出力する (シェルの cd 用)。"""
+    if not args:
+        die("使い方: atc dir <コンテスト名>")
+    print(contest_dir(args[0].lower()))
+    return 0
+
+
 def cmd_login(_args):
     print("開催中のコンテストのサンプル取得にはログインセッションが必要です。")
     print("1. ブラウザで https://atcoder.jp にログイン")
@@ -574,8 +604,9 @@ def cmd_help(_args=None):
   {cyan('atc test [file] [-d|--debug] [-r|--refetch]')}
       サンプルを自動取得してコンパイル & 全ケース照合 ({bold('Ctrl+Space')})
       file 省略時はカレントで最後に編集した .cpp
-  {cyan('atc new <contest>')}      コンテスト用ディレクトリ作成 + 全サンプル事前取得
-                         (例: atc new abc467)
+  {cyan('atc new <contest> [問題]')} コンテスト用ディレクトリ作成 + サンプル事前取得 ({bold('Ctrl+N')})
+                         問題: 4 / a-d / abd など (省略時は問題一覧から自動)
+                         (例: atc new abc467 / atc new abc123 a-d)
   {cyan('atc fetch [file]')}       サンプルを再取得
   {cyan('atc run [file] [-d]')}    コンパイルして手入力で実行 (従来の run 相当)
   {cyan('atc open [file]')}        問題ページをブラウザで開く
@@ -595,6 +626,7 @@ COMMANDS = {
     "run": cmd_run,
     "open": cmd_open, "o": cmd_open,
     "stress": cmd_stress,
+    "dir": cmd_dir,
     "login": cmd_login,
     "help": cmd_help, "-h": cmd_help, "--help": cmd_help,
 }

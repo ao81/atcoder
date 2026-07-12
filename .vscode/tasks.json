@@ -50,7 +50,7 @@
 		{
 			"label": "AtCoder: 新規コンテスト作成",
 			"type": "shell",
-			"command": "${workspaceFolder}/sh/atc new ${input:contest}",
+			"command": "${workspaceFolder}/sh/atc new ${input:contest} ${input:letters}",
 			"options": { "cwd": "${workspaceFolder}" },
 			"presentation": { "reveal": "always", "focus": true },
 			"problemMatcher": []
@@ -61,6 +61,12 @@
 			"id": "contest",
 			"type": "promptString",
 			"description": "コンテスト名 (例: abc467)"
+		},
+		{
+			"id": "letters",
+			"type": "promptString",
+			"description": "作成する問題 (例: 4 / a-d / abd。空 = 問題一覧から自動)",
+			"default": ""
 		}
 	]
 }
