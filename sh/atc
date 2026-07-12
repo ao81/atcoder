@@ -1,0 +1,3 @@
+#!/bin/bash
+# atc — AtCoder ローカルテスト支援ツールのラッパー
+exec python3 "$(dirname "$(readlink -f "$0")")/atc.py" "$@"

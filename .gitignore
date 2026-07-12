@@ -1,2 +1,5 @@
 *.out
 *.txt
+tests/
+stress_fail.in
+__pycache__/

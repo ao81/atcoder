@@ -1,0 +1,66 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "AtCoder: テスト (サンプル照合)",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc test ${fileBasename}",
+			"options": { "cwd": "${fileDirname}", "env": { "ATC_COLOR": "1" } },
+			"group": { "kind": "build", "isDefault": true },
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"clear": true,
+				"focus": false,
+				"showReuseMessage": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "AtCoder: デバッグテスト (sanitizer)",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc test ${fileBasename} --debug",
+			"options": { "cwd": "${fileDirname}", "env": { "ATC_COLOR": "1" } },
+			"group": "build",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": []
+		},
+		{
+			"label": "AtCoder: サンプル再取得",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc fetch ${fileBasename}",
+			"options": { "cwd": "${fileDirname}" },
+			"problemMatcher": []
+		},
+		{
+			"label": "AtCoder: 手入力で実行 (run)",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc run ${fileBasename}",
+			"options": { "cwd": "${fileDirname}" },
+			"presentation": { "reveal": "always", "panel": "dedicated", "focus": true },
+			"problemMatcher": []
+		},
+		{
+			"label": "AtCoder: 問題ページを開く",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc open ${fileBasename}",
+			"options": { "cwd": "${fileDirname}" },
+			"problemMatcher": []
+		},
+		{
+			"label": "AtCoder: 新規コンテスト作成",
+			"type": "shell",
+			"command": "${workspaceFolder}/sh/atc new ${input:contest}",
+			"options": { "cwd": "${workspaceFolder}" },
+			"presentation": { "reveal": "always", "focus": true },
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "contest",
+			"type": "promptString",
+			"description": "コンテスト名 (例: abc467)"
+		}
+	]
+}
