@@ -30,6 +30,9 @@ atc help                    ヘルプ
 - 照合は行末空白・空白量の差を無視。数値は相対/絶対誤差 1e-6 まで許容 (`ATC_EPS` で変更)
 - 実行制限は 2 秒 (`ATC_TL=4 atc test` などで変更)
 - ソース内に `atcoder/` があれば ac-library を、`gmpxx.h` があれば GMP を自動リンク
+- テンプレート [`!template.cpp`](!template.cpp) には chmin/chmax・vector 一括入出力
+  (`cin >> v` / `cout << v`)・`yesno(bool)`・`dbg(...)` 付き。
+  `dbg()` はローカル専用 (atc が `-DLOCAL` を付与)。提出コードに残してもジャッジでは無効
 - **提出だけは reCAPTCHA の関係で手動**: 全 AC 時に提出ページの URL が表示される
 
 VS Code のタスク (`Ctrl+Space` = 既定ビルドタスク) は [.vscode/tasks.json](.vscode/tasks.json)、

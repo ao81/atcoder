@@ -273,7 +273,7 @@ def compile_cpp(src, debug=False, quiet=False):
     os.makedirs(bindir, exist_ok=True)
     with open(src, encoding="utf-8", errors="replace") as f:
         code = f.read()
-    flags = ["-std=gnu++20", "-O2", "-Wall", "-Wextra"]
+    flags = ["-std=gnu++20", "-O2", "-Wall", "-Wextra", "-DLOCAL"]
     link = []
     if "atcoder/" in code:
         for acl in (os.environ.get("ATC_ACL"),
@@ -399,6 +399,8 @@ def cmd_test(args):
             if ok:
                 mark = green("AC ") + (dim(" (誤差許容)") if used_float else "")
                 print(label + mark + f"  {ms}")
+                if err.strip():  # dbg() などの stderr 出力を表示
+                    show_block("stderr:", err.strip()[-1000:], limit=10)
                 n_ac += 1
             else:
                 print(label + red("WA ") + f"  {ms}")
