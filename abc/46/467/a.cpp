@@ -43,11 +43,7 @@ int main(void) {
 
 	int h, w;
 	cin >> h >> w;
-	double height = h / 100.0;
-	double bmi = w / height / height;
 
-	if (bmi >= 25.0) cout << "Yes\n";
-	else cout << "No\n";
-
+	yesno(10000 * w >= 25 * h * h);
 	return 0;
 }
