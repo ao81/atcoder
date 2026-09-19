@@ -42,6 +42,6 @@ int main(void) {
 	cin.tie(nullptr)->sync_with_stdio(false);
 
 	string s; cin >> s;
-	cout << s << (s.back == 'e' ? "r" : "er") << "\n";
+	cout << s << (s.back() == 'e' ? "r" : "er") << "\n";
 	return 0;
 }
